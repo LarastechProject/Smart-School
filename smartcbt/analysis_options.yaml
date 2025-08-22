@@ -1,0 +1,14 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - avoid_dynamic_calls
+    - prefer_final_locals
+    - prefer_const_constructors
+    - prefer_const_literals_to_create_immutables
+    - always_declare_return_types
+    - cancel_subscriptions
+
+analyzer:
+  exclude:
+    - build/**
