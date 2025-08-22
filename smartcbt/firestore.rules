@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function schoolId() { return request.resource.data.schoolId; }
+    function hasRole(sid, role) {
+      return exists(/databases/$(database)/documents/schools/$(sid)/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/schools/$(sid)/users/$(request.auth.uid)).data.roles[role] == true;
+    }
+
+    match /schools/{sid} {
+      allow read: if true; // branding public
+      allow write: if isSignedIn() && hasRole(sid, 'admin');
+
+      match /settings/{doc} {
+        allow read: if true;
+        allow write: if isSignedIn() && hasRole(sid, 'admin');
+      }
+
+      match /users/{uid} {
+        allow read: if isSignedIn() && (uid == request.auth.uid || hasRole(sid, 'admin'));
+        allow write: if isSignedIn() && hasRole(sid, 'admin');
+      }
+
+      match /exams/{examId} {
+        allow read: if true; // exam descriptions can be public
+        allow write: if isSignedIn() && (hasRole(sid, 'teacher') || hasRole(sid, 'admin'));
+      }
+
+      match /examTokens/{tokenId} {
+        allow read, write: if isSignedIn() && (hasRole(sid, 'teacher') || hasRole(sid, 'admin'));
+      }
+
+      match /submissions/{submissionId} {
+        allow read: if isSignedIn();
+        allow write: if isSignedIn();
+      }
+
+      match /messages/{threadId} {
+        allow read, write: if isSignedIn();
+      }
+    }
+  }
+}

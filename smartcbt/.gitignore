@@ -1,0 +1,15 @@
+# Flutter
+**/build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+
+# Firebase
+functions/lib/
+functions/node_modules/
+
+# Env
+.env
+.firebase/
